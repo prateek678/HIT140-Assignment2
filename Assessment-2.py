@@ -6,8 +6,8 @@ import scipy.stats as st
 
 
 #Loading datasets
-d1 = pd.read_csv("/Users/sagar/Desktop/git hit 140 /HIT140-Assignment2/dataset1.csv")
-d2 = pd.read_csv("/Users/sagar/Desktop/git hit 140 /HIT140-Assignment2/dataset2.csv")
+d1 = pd.read_csv("dataset1.csv")
+d2 = pd.read_csv("dataset2.csv")
 
 #Peek on datasets
 print(d1.head())
@@ -78,7 +78,7 @@ plt.ylabel("seconds")
 plt.show()
 
 """
-    There are huge number of outliers in bat_landing_to_food let's remove them to clean the data. These outliers may affect our final result.
+    There are huge number of outliers in bat_landing_to_food let's remove them to clean the data. These outliers may affect our final result.
 """
 #Cleaning outliers
 Q1 = d1['bat_landing_to_food'].quantile(0.25)
@@ -178,3 +178,42 @@ plt.title("Distribution of 'rat_arrival_number' and 'bat_landing_number'")
 plt.xlabel("Bat Landing Number")
 plt.ylabel("Rat Arrival Number")
 plt.show()
+
+#Case 2: Bat Landing number and Rat Minutes
+"""
+    Here we check how often bat lands when rats are present. 
+    Using features 'bat_landing_number' and 'rat_minutes'
+"""
+sample1d2 = d2.loc[d2['rat_minutes'] > 0, 'bat_landing_number']
+sample2d2 = d2.loc[d2['rat_minutes'] == 0, 'bat_landing_number']
+
+#calculating mean and standard deviation of dataset2
+mean1d2 = sample1d2.mean()
+mean2d2 = sample2d2.mean()
+std1d2 = sample1d2.std()
+std2d2 = sample2d2.std()
+
+n1d2 = len(sample1d2)
+n2d2 = len(sample2d2)
+
+"""
+    Let's use two sample t-test to test if these two samples have equal mean or not
+    Null Hypothesis:- Number of bat landing in platform when rats are present is equal to number
+    of bats landing when rats are not present
+    Alternate Hypothesis:- Number of bat landing in platform when rats are present is not equal to 
+    number of bats landing when rats are not present.
+"""
+t2_value, p2_value = st.ttest_ind_from_stats(mean1d2, std1d2, n1d2, mean2d2, std2d2, n2d2, equal_var=False)
+print("T2_value ", t2_value)
+print("P2_Value ", p2_value)
+
+"""
+    Here t-value is -5.08. The -ve sign indicates that mean number of bat landing when rats
+    are not present is greater than the mean number of bat landing when rats are present.
+    And 'p_value' is 4.38x10^-7, this means the two mean are not equal (Reject Nulll Hypothesis). 
+"""
+
+#So, it came to the conclusion, that from dataset 1 bats take much time to land when taking risk.
+#Also, from dataset 2 using t-test it is proved that when rats are present, less bat land on platform.
+#So, this makes sense that bats are avoiding rats and perceive them as predators.
+
